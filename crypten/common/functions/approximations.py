@@ -526,11 +526,20 @@ def _diff_gelu_tanh(x):
 def _diff_silu(x):
     return torch.sign(x) * (torch.nn.functional.silu(x) - torch.nn.functional.relu(x))
 
-def gelu(self, approximate="none"):
+def gelu(self, approximate="none", d2poly_a=None, d2poly_b=None, d2poly_c=None):
     r"""Compute the Gaussian error linear unit of a tensor"""
     method = cfg.functions.gelu_method
     if method == "ideal":
         return crypten.cryptensor(torch.nn.functional.gelu(self.get_plain_text(), approximate=approximate), device=self.device)
+    elif method == "d2poly":
+        # Quadratic approximation: GELU(x) ~= a * x^2 + b * x + c
+        if d2poly_a is None:
+            d2poly_a = cfg.functions.gelu_d2poly_a
+        if d2poly_b is None:
+            d2poly_b = cfg.functions.gelu_d2poly_b
+        if d2poly_c is None:
+            d2poly_c = cfg.functions.gelu_d2poly_c
+        return self.square().mul(d2poly_a).add(self.mul(d2poly_b)).add(d2poly_c)
     elif method == "fourier":
         period = cfg.functions.gelu_fs_period
         width = period / 2

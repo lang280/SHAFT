@@ -59,9 +59,12 @@ functions:
   erf_fs_terms: 5
   
   # gelu function configuration
-  gelu_method: "fourier"
+  gelu_method: "d2poly"
   gelu_fs_period: 8
   gelu_fs_terms: 8
+  gelu_d2poly_a: 0.147
+  gelu_d2poly_b: 0.584
+  gelu_d2poly_c: -0.012
 
   # silu function configuration
   silu_method: "fourier"
